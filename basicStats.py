@@ -59,7 +59,7 @@ daily_return.rolling(window=20).std()
 daily_return.rolling(window=20, min_periods=1).mean()
 
 #exponential weigh puts more weight on recent values
-aily_return.ewm(span=20,min_periods=20).mean()
+daily_return.ewm(span=20,min_periods=20).mean()
 daily_return.ewm(span=20,min_periods=20).std()
 
 
