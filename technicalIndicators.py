@@ -11,6 +11,9 @@ import yfinance as yf
 import datetime as dt
 import matplotlib.pyplot as plt
 import numpy as np
+import statsmodels.api as sm
+import pandas as pd
+from stocktrends import Renko
 
 ticker = ["TSLA"]
 
@@ -132,21 +135,124 @@ RSI(ohlcv)['RSI'].plot()
 RSI(ohlcv)['Adj Close'].plot()
 
 
+"""
+ADX
+(average directional index)
+"""
 
 
 
+def ADX(DF,n=14):
+    """function to calculate ADX"""
+    df = DF.copy()
+    df['TR'] = ATR(df,n)['TR'] #the period parameter of ATR function does not matter because period does not influence TR calculation
+    df['DMplus']=np.where((df['High']-df['High'].shift(1))>(df['Low'].shift(1)-df['Low']),df['High']-df['High'].shift(1),0)
+    df['DMplus']=np.where(df['DMplus']<0,0,df['DMplus'])
+    df['DMminus']=np.where((df['Low'].shift(1)-df['Low'])>(df['High']-df['High'].shift(1)),df['Low'].shift(1)-df['Low'],0)
+    df['DMminus']=np.where(df['DMminus']<0,0,df['DMminus'])
+    TRn = []
+    DMplusN = []
+    DMminusN = []
+    TR = df['TR'].tolist()
+    DMplus = df['DMplus'].tolist()
+    DMminus = df['DMminus'].tolist()
+    #TR taken care of by ATR
+    #DM+/- use smoothing formulas
+    for i in range(len(df)):
+        if i < n:
+            TRn.append(np.NaN)
+            DMplusN.append(np.NaN)
+            DMminusN.append(np.NaN)
+        elif i == n:
+            TRn.append(df['TR'].rolling(n).sum().tolist()[n])
+            DMplusN.append(df['DMplus'].rolling(n).sum().tolist()[n])
+            DMminusN.append(df['DMminus'].rolling(n).sum().tolist()[n])
+        elif i > n:
+            TRn.append(TRn[i-1] - (TRn[i-1]/n) + TR[i])
+            DMplusN.append(DMplusN[i-1] - (DMplusN[i-1]/n) + DMplus[i])
+            DMminusN.append(DMminusN[i-1] - (DMminusN[i-1]/n) + DMminus[i])
+    df['TRn'] = np.array(TRn)
+    df['DMplusN'] = np.array(DMplusN)
+    df['DMminusN'] = np.array(DMminusN)
+    df['DIplusN']=100*(df['DMplusN']/df['TRn'])
+    df['DIminusN']=100*(df['DMminusN']/df['TRn'])
+    df['DIdiff']=abs(df['DIplusN']-df['DIminusN'])
+    df['DIsum']=df['DIplusN']+df['DIminusN']
+    df['DX']=100*(df['DIdiff']/df['DIsum'])
+    ADX = []
+    DX = df['DX'].tolist()
+    #ADX is smoothed. Note it is a rolling of rolling. 
+    for j in range(len(df)):
+        if j < 2*n-1:
+            ADX.append(np.NaN)
+        elif j == 2*n-1:
+            ADX.append(df['DX'][j-n+1:j+1].mean())
+        elif j > 2*n-1:
+            ADX.append(((n-1)*ADX[j-1] + DX[j])/n)
+    df['ADX']=np.array(ADX)
+    return df
+
+
+"""
+OBV
+(on balance volume)
+"""
+
+def OBV(DF):
+    """function to calculate On Balance Volume"""
+    df = DF.copy()
+    df['daily_ret'] = df['Adj Close'].pct_change()
+    df['direction'] = np.where(df['daily_ret']>=0,1,-1)
+    #fix first value getting -l direction
+    df['direction'][0] = 0
+    df['vol_adj'] = df['Volume'] * df['direction']
+    df['obv'] = df['vol_adj'].cumsum()
+    return df
+
+
+"""
+Simple Regression
+(uses OLS from statsmodels)
+"""
+
+
+def slope(ser,n):
+    """function to calculate the slope of regression line for n consecutive points on a plot"""
+    ser = (ser - ser.min())/(ser.max() - ser.min())
+    x = np.array(range(len(ser)))
+    x = (x - x.min())/(x.max() - x.min())
+    slopes = [i*0 for i in range(n-1)]
+    for i in range(n,len(ser)+1):
+        y_scaled = ser[i-n:i]
+        x_scaled = x[i-n:i]
+        x_scaled = sm.add_constant(x_scaled)
+        model = sm.OLS(y_scaled,x_scaled)
+        results = model.fit()
+        slopes.append(results.params[-1])
+    #the result will be a list of slopes given in degrees
+    slope_angle = (np.rad2deg(np.arctan(np.array(slopes))))
+    return np.array(slope_angle)
 
 
 
+"""
+Renko Chart 
+
+"""
+
+def renko_DF(DF):
+    "function to convert ohlc data into renko bricks"
+    df = DF.copy()
+    df.reset_index(inplace=True)
+    df = df.iloc[:,[0,1,2,3,5,6]]
+    df.rename(columns = {"Date" : "date", "High" : "high","Low" : "low", "Open" : "open","Adj Close" : "close", "Volume" : "volume"}, inplace = True)
+    df2 = Renko(df)
+    df2.brick_size = round(ATR(DF,120)["ATR"][-1],0)
+    renko_df = df2.get_ohlc_data() #if using older version of the library use get_bricks() instead
+    return renko_df
 
 
-
-
-
-
-
-
-
+renko_data = renko_DF(ohlcv)
 
 
 
