@@ -14,5 +14,4 @@
  * Renko + MACD <br>
 ## Value Investing:  <br>
  * Magic Formula <br>
- * Resistance Breakout <br>
  * F-Score <br>
