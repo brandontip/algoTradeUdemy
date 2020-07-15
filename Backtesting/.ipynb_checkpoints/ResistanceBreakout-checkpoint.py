@@ -30,7 +30,7 @@ def ATR(DF,n):
     return df2['ATR']
 
 def CAGR(DF):
-    "function to calculate the Cummulative Annual Growth Rate of a trading strategy"
+    "function to calculate the Cumulative Annual Growth Rate of a trading strategy"
     df = DF.copy()
     df["cum_return"] = (1 + df["ret"]).cumprod()
     n = len(df)/(252*78)

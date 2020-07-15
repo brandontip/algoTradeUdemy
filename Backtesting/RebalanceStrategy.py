@@ -115,3 +115,4 @@ plt.title("Index Return vs Strategy Return")
 plt.ylabel("cumulative return")
 plt.xlabel("months")
 ax.legend(["Strategy Return","Index Return"])
+
