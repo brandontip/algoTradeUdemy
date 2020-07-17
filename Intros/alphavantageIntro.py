@@ -18,7 +18,7 @@ from alpha_vantage.timeseries import TimeSeries
 import pandas as pd
 import time 
 
-myKey='NLVE5M5QN0X68ZB3'
+myKey=''
 
 #extract data for a single ticker
 #ts = TimeSeries(key=myKey, output_format='pandas')
