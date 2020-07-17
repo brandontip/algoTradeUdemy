@@ -15,3 +15,6 @@
 ## Value Investing:  <br>
  * Magic Formula <br>
  * F-Score <br>
+## Simple Trade Bots:  <br>
+ * Renko MACD <br>
+ * SMA Crossover <br>
