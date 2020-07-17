@@ -1,12 +1,13 @@
 # algoTradeUdemy 
 ## About: <br>
- * Python codes for algorithmic trading course on Udemy <br>
+ * Python codes created in "Algorithmic trading & quantitative analysis using python" course <br>
  * Python version 3.7 <br>
 ## Intros: <br>
  * Historical Data APIs <br>
  * Visualization <br>
  * Web Scraping <br>
  * Technical Indicators <br>
+ * Trading APIs <br>
 ## Backtesting:  <br>
  * Rebalancing Strat <br>
  * Resistance Breakout <br>
