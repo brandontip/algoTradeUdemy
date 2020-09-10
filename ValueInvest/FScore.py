@@ -6,13 +6,6 @@ Created on Thu Jul 16 12:23:09 2020
 """
 
 
-# ============================================================================
-# Piotroski f score implementation (data scraped from yahoo finance)
-# Author - Mayank Rasu
-
-# Please report bugs/issues in the Q&A section
-# =============================================================================
-
 
 import requests
 from bs4 import BeautifulSoup
