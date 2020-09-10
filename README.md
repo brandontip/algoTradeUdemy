@@ -23,4 +23,4 @@
  * Intro to NLTK, VADER, Textblob  <br>
  * Scikit-learn sentiment analysis <br>
 ## Additional Topics: <br> 
- * Using AWS + Crontab to automoate files on a cloud
+ * Using AWS + Crontab to automate scripts on a cloud
